@@ -1,1 +1,1 @@
-# TSP_SMMAS
+# Solve TSP problem using SMMAS
