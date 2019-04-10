@@ -208,12 +208,25 @@ public:
         case_best = _case;
     }
 
+    long double localDistance(int i, int j)
+    {
+        return w[i][j];
+    }
+
     void localSearch_3opt(int loopLimits = 1000) // using 2-opt
     {
-        initPointer();
+        w = new long double*[n];
+        for(int i = 0; i < n; i++)
+            w[i] = new long double[n];
+        for(int i = 0; i < n; i++)
+            for(int j = 0; j < n; j++) 
+                w[i][j] = distance(i, j);
         int loop = 0;
         while (++loop < loopLimits)
         {
+            for(int i = 0; i < n; i++)
+                for(int j = 0; j < n; j++) 
+                    w[i][j] = distance(i, j);
             bool isItChange = false;
             long double best = EPSILON;
             int ires, jres, kres, case_best;
@@ -224,49 +237,49 @@ public:
                         if (k == n - 1 && i == 0) continue;
                         int ni = nextVertex(i), nj = nextVertex(j), nk = nextVertex(k);
                         //case 1
-                        long double diff = distance(i, ni) + distance(k, nk) - distance(i, k) - distance(ni, nk);
+                        long double diff = localDistance(i, ni) + localDistance(k, nk) - localDistance(i, k) - localDistance(ni, nk);
                         if (diff > best)
                         {
                             best = diff;
                             update_case(ires, jres, kres, i, j, k, case_best, 1);
                         }
                         //case 2
-                        diff = distance(j, nj) + distance(k, nk) - distance(j, k) - distance(nj, nk);
+                        diff = localDistance(j, nj) + localDistance(k, nk) - localDistance(j, k) - localDistance(nj, nk);
                         if (diff > best)
                         {
                             best = diff;
                             update_case(ires, jres, kres, i, j, k, case_best, 2);
                         }
                         //case 3
-                        diff = distance(i, ni) + distance(j, nj) - distance(i, j) - distance(ni, nj);
+                        diff = localDistance(i, ni) + localDistance(j, nj) - localDistance(i, j) - localDistance(ni, nj);
                         if (diff > best)
                         {
                             best = diff;
                             update_case(ires, jres, kres, i, j, k, case_best, 3);
                         }
                         //case 4
-                        diff = distance(i, ni) + distance(j, nj) + distance(k, nk) - distance(i, j) - distance(ni, k) - distance(nj, nk);
+                        diff = localDistance(i, ni) + localDistance(j, nj) + localDistance(k, nk) - localDistance(i, j) - localDistance(ni, k) - localDistance(nj, nk);
                         if (diff > best)
                         {
                             best = diff;
                             update_case(ires, jres, kres, i, j, k, case_best, 4);
                         }
                         //case 5
-                        diff = distance(i, ni) + distance(j, nj) + distance(k, nk) - distance(i, nj) - distance(k, j) - distance(ni, nk);
+                        diff = localDistance(i, ni) + localDistance(j, nj) + localDistance(k, nk) - localDistance(i, nj) - localDistance(k, j) - localDistance(ni, nk);
                         if (diff > best)
                         {
                             best = diff;
                             update_case(ires, jres, kres, i, j, k, case_best, 5);
                         }
                         //case 6
-                        diff = distance(i, ni) + distance(j, nj) + distance(k, nk) - distance(i, k) - distance(ni, nj) - distance(j, nk);
+                        diff = localDistance(i, ni) + localDistance(j, nj) + localDistance(k, nk) - localDistance(i, k) - localDistance(ni, nj) - localDistance(j, nk);
                         if (diff > best)
                         {
                             best = diff;
                             update_case(ires, jres, kres, i, j, k, case_best, 6);
                         }
                         // case 7 
-                        diff = distance(i, ni) + distance(j, nj) + distance(k, nk) - distance(i, nj) - distance(k, ni) - distance(j, nk);
+                        diff = localDistance(i, ni) + localDistance(j, nj) + localDistance(k, nk) - localDistance(i, nj) - localDistance(k, ni) - localDistance(j, nk);
                         if (diff > best)
                         {
                             best = diff;
@@ -327,10 +340,13 @@ public:
                     temp.clear();
                     assert(abs(preLength - best - length()) <= 0.001);
                 }
+                cerr << best << " " << length() << " " << case_best << " " << loop << endl;
+                cerr << loop << " " <<  clock() / CLOCKS_PER_SEC << "s\n";
             }
             if (!isItChange) break;
         }
-        clearPointer();
+        delete w;
+        w = NULL;
     }
 
     void clear()
